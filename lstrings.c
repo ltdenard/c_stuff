@@ -7,6 +7,7 @@
 
 #define MAX_MATCHES 1
 
+//gcc -o lstrings lstrings.c -I/usr/include -lpcre -lpthread
 
 int main(int argc, char *argv[])
 {
