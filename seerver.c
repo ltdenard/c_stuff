@@ -1,3 +1,4 @@
+#include <time.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -118,9 +119,26 @@ int main(int argc, char **argv)
             SSL_read(ssl, (char *)charBuffer, 1024);
             if (charBuffer > 0)
             {
-                printf("%d\n", strlen(charBuffer));
+                /* printf("%d\n", strlen(charBuffer)); */
                 printf("%s\n", charBuffer);
-                char reply[] = "HTTP/1.1 200 OK\nDate: Thu, 19 Feb 2009 12:27:04 GMT\nServer: Apache/2.2.3\nLast-Modified: Wed, 18 Jun 2003 16:05:58 GMT\nETag: \"56d-9989200-1132c580\"\nContent-Type: text/html\nContent-Length: 15\nAccept-Ranges: bytes\nConnection: close\n\nHello World";
+                time_t t = time(NULL);
+                struct tm *tm = localtime(&t);
+                char s[64];
+                strftime(s, sizeof(s), "%a, %d %b %Y %H:%M:%S %Z", tm);
+                char reply[] = "HTTP/2 200\n";
+                strcat(reply, "date: ");
+                strcat(reply, s);
+                strcat(reply, "\n");
+                strcat(reply, "server: nginx\n");
+                strcat(reply, "content-type: text/html; charset=utf-8\n");
+                strcat(reply, "x-frame-options: SAMEORIGIN\n");
+                strcat(reply, "strict-transport-security: max-age=63072000; includeSubDomains; preload\n");
+                strcat(reply, "x-frame-options: DENY\n");
+                strcat(reply, "x-content-type-options: nosniff\n");
+                strcat(reply, "x-xss-protection: 1; mode=block\n");
+                strcat(reply, "x-robots-tag: none\n");
+                strcat(reply, "\n\n");
+                strcat(reply, "Hello World");
                 SSL_write(ssl, reply, strlen(reply));
             }
         }
